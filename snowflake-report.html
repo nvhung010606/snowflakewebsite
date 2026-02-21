@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SNOW | Equity Research Report</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #0a0e17;
+  --surface: #111827;
+  --surface2: #1a2332;
+  --border: #1e2d3d;
+  --accent: #29b6f6;
+  --accent2: #00e5ff;
+  --green: #4caf50;
+  --red: #ef5350;
+  --amber: #ffb74d;
+  --text: #e8edf4;
+  --text2: #8899aa;
+  --text3: #566677;
+  --snow-gradient: linear-gradient(135deg, #29b6f6 0%, #00e5ff 50%, #26c6da 100%);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Instrument Sans', sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ── HERO ── */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 40%, rgba(41,182,246,0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 80% 60%, rgba(0,229,255,0.05) 0%, transparent 70%);
+}
+
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(41,182,246,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(41,182,246,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 30%, transparent 100%);
+}
+
+.hero-content {
+  position: relative; z-index: 2;
+  text-align: center;
+  padding: 2rem;
+  animation: fadeUp 1s ease-out;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ticker-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 40px;
+  padding: 8px 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--accent);
+  margin-bottom: 2rem;
+  letter-spacing: 0.5px;
+}
+
+.ticker-badge .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.hero-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(3rem, 7vw, 6rem);
+  line-height: 1.1;
+  margin-bottom: 1rem;
+  background: var(--snow-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-subtitle {
+  font-size: 1.15rem;
+  color: var(--text2);
+  max-width: 600px;
+  margin: 0 auto 3rem;
+}
+
+.hero-metrics {
+  display: flex;
+  gap: 1px;
+  background: var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.hero-metric {
+  flex: 1;
+  background: var(--surface);
+  padding: 1.5rem 1rem;
+  text-align: center;
+}
+
+.hero-metric:first-child { border-radius: 16px 0 0 16px; }
+.hero-metric:last-child { border-radius: 0 16px 16px 0; }
+
+.hero-metric .label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text3);
+  margin-bottom: 6px;
+}
+
+.hero-metric .value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.hero-metric .value.price { color: var(--accent); }
+.hero-metric .value.target { color: var(--amber); }
+.hero-metric .value.hold { color: var(--amber); font-family: 'Instrument Sans', sans-serif; font-weight: 700; }
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--text3);
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  animation: bob 2s ease-in-out infinite;
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(8px); }
+}
+
+.scroll-indicator svg { opacity: 0.5; }
+
+/* ── NAV ── */
+.sticky-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10,14,23,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+}
+
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  height: 56px;
+  overflow-x: auto;
+}
+
+.nav-link {
+  font-size: 0.82rem;
+  color: var(--text3);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s;
+  letter-spacing: 0.3px;
+}
+
+.nav-link:hover { color: var(--accent); }
+
+.nav-brand {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  color: var(--accent);
+  font-size: 0.9rem;
+  margin-right: auto;
+}
+
+/* ── SECTIONS ── */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+section {
+  padding: 5rem 0;
+}
+
+.section-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.section-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  margin-bottom: 1.5rem;
+  color: var(--text);
+}
+
+.section-desc {
+  color: var(--text2);
+  max-width: 680px;
+  font-size: 1rem;
+  line-height: 1.75;
+  margin-bottom: 3rem;
+}
+
+/* ── CARDS ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.card {
+  background: var(--surface);
+  padding: 2rem;
+}
+
+.card-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  font-size: 1.2rem;
+}
+
+.card-icon.blue { background: rgba(41,182,246,0.12); color: var(--accent); }
+.card-icon.green { background: rgba(76,175,80,0.12); color: var(--green); }
+.card-icon.amber { background: rgba(255,183,77,0.12); color: var(--amber); }
+.card-icon.red { background: rgba(239,83,80,0.12); color: var(--red); }
+
+.card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.card p {
+  font-size: 0.88rem;
+  color: var(--text2);
+  line-height: 1.65;
+}
+
+/* ── KPI ROW ── */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 3rem;
+}
+
+.kpi {
+  background: var(--surface);
+  padding: 1.75rem 1.5rem;
+}
+
+.kpi .label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text3);
+  margin-bottom: 8px;
+}
+
+.kpi .val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.kpi .sub {
+  font-size: 0.78rem;
+  color: var(--text3);
+  margin-top: 4px;
+}
+
+/* ── CHART CONTAINERS ── */
+.chart-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.chart-wrap h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.chart-wrap .chart-sub {
+  font-size: 0.8rem;
+  color: var(--text3);
+  margin-bottom: 1.5rem;
+}
+
+.chart-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 768px) {
+  .chart-row { grid-template-columns: 1fr; }
+}
+
+canvas { max-height: 350px; }
+
+/* ── COMPS TABLE ── */
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow-x: auto;
+  margin-bottom: 2rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+thead th {
+  background: var(--surface2);
+  padding: 1rem 1.25rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text3);
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border);
+}
+
+tbody td {
+  padding: 0.9rem 1.25rem;
+  border-bottom: 1px solid rgba(30,45,61,0.5);
+  white-space: nowrap;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+}
+
+tbody td:first-child {
+  font-family: 'Instrument Sans', sans-serif;
+  font-weight: 600;
+  color: var(--text);
+}
+
+tbody tr:hover { background: rgba(41,182,246,0.03); }
+
+tbody tr.highlight {
+  background: rgba(41,182,246,0.06);
+  border-top: 1px solid var(--accent);
+  border-bottom: 1px solid var(--accent);
+}
+
+tbody tr.highlight td { color: var(--accent); font-weight: 600; }
+
+/* ── DCF SECTION ── */
+.dcf-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) { .dcf-grid { grid-template-columns: 1fr; } }
+
+.dcf-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+}
+
+.dcf-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.dcf-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid rgba(30,45,61,0.4);
+  font-size: 0.88rem;
+}
+
+.dcf-row .lbl { color: var(--text2); }
+.dcf-row .val {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 500;
+}
+
+.dcf-row.total { border-top: 2px solid var(--accent); border-bottom: none; padding-top: 1rem; }
+.dcf-row.total .val { color: var(--accent); font-size: 1.1rem; }
+
+/* ── SENSITIVITY ── */
+.sens-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.sens-table th, .sens-table td {
+  padding: 0.6rem 0.8rem;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.sens-table th {
+  background: var(--surface2);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sens-table .center-cell {
+  background: rgba(41,182,246,0.15);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* ── SCENARIO TABS ── */
+.scenario-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 2rem;
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  width: fit-content;
+}
+
+.scenario-tab {
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text3);
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.scenario-tab.active {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.scenario-tab:hover:not(.active) {
+  color: var(--text);
+}
+
+.scenario-content { display: none; }
+.scenario-content.active { display: block; }
+
+/* ── RISK SECTION ── */
+.risk-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 768px) { .risk-grid { grid-template-columns: 1fr; } }
+
+.risk-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  border-left: 3px solid var(--red);
+}
+
+.risk-item h4 {
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+}
+
+.risk-item p {
+  font-size: 0.85rem;
+  color: var(--text2);
+  line-height: 1.65;
+}
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 3rem 0;
+  text-align: center;
+  color: var(--text3);
+  font-size: 0.78rem;
+}
+
+footer p { max-width: 600px; margin: 0 auto; line-height: 1.7; }
+
+/* ── ANIMATION ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── SCENARIO PRICE BAR ── */
+.price-bar-wrap {
+  margin: 2rem 0;
+}
+
+.price-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text3);
+  margin-bottom: 6px;
+}
+
+.price-bar {
+  position: relative;
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--red), var(--amber), var(--green));
+}
+
+.price-marker {
+  position: absolute;
+  top: -6px;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 3px solid var(--accent);
+  transform: translateX(-50%);
+}
+
+.price-marker-label {
+  position: absolute;
+  top: -28px;
+  transform: translateX(-50%);
+  font-size: 0.72rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent);
+  white-space: nowrap;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ HERO ═══════════ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="ticker-badge"><span class="dot"></span> NYSE: SNOW</div>
+    <h1 class="hero-title">Snowflake Inc.</h1>
+    <p class="hero-subtitle">Equity Research Report — Cloud Data Platform · AI Data Cloud · Consumption-Based SaaS</p>
+    <div class="hero-metrics">
+      <div class="hero-metric">
+        <div class="label">Current Price</div>
+        <div class="value price">$241.99</div>
+      </div>
+      <div class="hero-metric">
+        <div class="label">Target Price</div>
+        <div class="value target">$210.48</div>
+      </div>
+      <div class="hero-metric">
+        <div class="label">Upside</div>
+        <div class="value" style="color:var(--red)">-5.44%</div>
+      </div>
+      <div class="hero-metric">
+        <div class="label">Recommendation</div>
+        <div class="value hold">HOLD</div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-indicator">
+    SCROLL
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+  </div>
+</section>
+
+<!-- ═══════════ NAV ═══════════ -->
+<nav class="sticky-nav">
+  <div class="nav-inner">
+    <span class="nav-brand">SNOW</span>
+    <a href="#overview" class="nav-link">Overview</a>
+    <a href="#financials" class="nav-link">Financials</a>
+    <a href="#industry" class="nav-link">Industry</a>
+    <a href="#comps" class="nav-link">Comps</a>
+    <a href="#valuation" class="nav-link">Valuation</a>
+    <a href="#risks" class="nav-link">Risks</a>
+  </div>
+</nav>
+
+<!-- ═══════════ OVERVIEW ═══════════ -->
+<section id="overview">
+  <div class="container reveal">
+    <div class="section-label">Company Overview</div>
+    <div class="section-title">The AI Data Cloud</div>
+    <div class="section-desc">
+      Snowflake is a cloud-native data platform founded in 2012, headquartered in Bozeman, Montana. It provides the Snowflake AI Data Cloud — a fully managed platform for centralized data, analytics, ML workloads, and secure data sharing. Running on AWS, Azure, and GCP, Snowflake offers multi-cloud flexibility with a consumption-based pricing model.
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon blue">☁️</div>
+        <h3>AI Tailwinds</h3>
+        <p>Cortex AI, Snowpark, and native app frameworks position Snowflake as the governed data layer under enterprise AI workloads. Monetization is early-stage but accelerating.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon green">📈</div>
+        <h3>Strong Growth KPIs</h3>
+        <p>Net Revenue Retention ~130%, RPO growth ~40% YoY, and product gross margins ~74% reflect sticky usage and strong customer expansion dynamics.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon amber">⚖️</div>
+        <h3>Premium Valuation</h3>
+        <p>Trading at ~21x forward EV/Revenue, Snowflake sits at the upper end of high-growth software peers. DCF-based fair value of $252 suggests limited upside.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon red">⚠️</div>
+        <h3>Key Risks</h3>
+        <p>Hyperscaler competition, macro slowdown impacting consumption, and high stock-based compensation could pressure the premium multiple.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ MARKET PROFILE ═══════════ -->
+<section style="padding-top:0">
+  <div class="container reveal">
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="label">Market Cap</div>
+        <div class="val">$74.1B</div>
+      </div>
+      <div class="kpi">
+        <div class="label">52-Week Range</div>
+        <div class="val">$120 – $281</div>
+      </div>
+      <div class="kpi">
+        <div class="label">EV / Revenue</div>
+        <div class="val">20.7x</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Inst. Holdings</div>
+        <div class="val">80.8%</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Shares Out.</div>
+        <div class="val">342.2M</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Avg Volume</div>
+        <div class="val">5.5M</div>
+      </div>
+    </div>
+
+    <div class="price-bar-wrap">
+      <div class="price-bar-labels">
+        <span>Bear: $218</span>
+        <span>Bull: $274</span>
+      </div>
+      <div class="price-bar">
+        <!-- Current price marker: range 218–274, current 242 → (242-218)/(274-218) = 42.8% -->
+        <div class="price-marker" style="left:42.8%">
+          <div class="price-marker-label">$241.99 Current</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ FINANCIALS ═══════════ -->
+<section id="financials">
+  <div class="container reveal">
+    <div class="section-label">Financial Performance</div>
+    <div class="section-title">Revenue & Profitability</div>
+    <div class="section-desc">
+      Snowflake's consumption-based model has driven strong revenue growth, from $592M in FY2021 to $3.6B in FY2025. While still GAAP-unprofitable due to high SBC and reinvestment, free cash flow margins of ~36% demonstrate the platform's underlying economics.
+    </div>
+
+    <div class="chart-row">
+      <div class="chart-wrap">
+        <h3>Revenue Growth</h3>
+        <div class="chart-sub">FY2021 – FY2025 ($ in millions)</div>
+        <canvas id="revenueChart"></canvas>
+      </div>
+      <div class="chart-wrap">
+        <h3>Margin Profile</h3>
+        <div class="chart-sub">Gross Margin, Net Income Margin, FCF Margin</div>
+        <canvas id="marginChart"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-row" style="margin-top:0">
+      <div class="chart-wrap">
+        <h3>Revenue by Segment</h3>
+        <div class="chart-sub">Product revenue dominates the mix</div>
+        <canvas id="segmentChart"></canvas>
+      </div>
+      <div class="chart-wrap">
+        <h3>Key Financial Ratios</h3>
+        <div class="chart-sub">FY2021 – FY2025</div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr><th>Metric</th><th>FY21</th><th>FY22</th><th>FY23</th><th>FY24</th><th>FY25</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Revenue ($M)</td><td>592</td><td>1,219</td><td>2,066</td><td>2,807</td><td>3,626</td></tr>
+              <tr><td>Growth %</td><td>—</td><td>106%</td><td>69%</td><td>36%</td><td>29%</td></tr>
+              <tr><td>Gross Margin</td><td>65%</td><td>68%</td><td>67%</td><td>68%</td><td>67%</td></tr>
+              <tr><td>Net Margin</td><td>-91%</td><td>-56%</td><td>-39%</td><td>-30%</td><td>-36%</td></tr>
+              <tr><td>FCF Margin</td><td>—</td><td>34%</td><td>37%</td><td>39%</td><td>36%</td></tr>
+              <tr><td>ROE</td><td>-20.2%</td><td>-13.6%</td><td>-15.2%</td><td>-15.7%</td><td>-31.5%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ INDUSTRY ═══════════ -->
+<section id="industry">
+  <div class="container reveal">
+    <div class="section-label">Industry Analysis</div>
+    <div class="section-title">Cloud Data & Analytics</div>
+    <div class="section-desc">
+      The global cloud data platform industry is projected to grow at ~20% CAGR through 2032, driven by data volume explosion, cloud migration, and AI adoption. By 2028, ~90% of analytics workloads are expected to run on cloud platforms — a massive tailwind for Snowflake.
+    </div>
+
+    <div class="card-grid" style="grid-template-columns: repeat(3, 1fr);">
+      <div class="card">
+        <div class="card-icon blue">💾</div>
+        <h3>Data Volume Explosion</h3>
+        <p>Enterprise data from IoT, digital products, and online interactions grows exponentially. Legacy systems can't scale — cloud-native platforms can.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon green">🔄</div>
+        <h3>Cloud Migration</h3>
+        <p>Most large organizations are still early-to-mid stage in migrating analytics to cloud, creating a multi-year structural growth driver.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon amber">🤖</div>
+        <h3>AI & Advanced Analytics</h3>
+        <p>Generative AI intensifies the need for centralized, governed data. Models require large, clean datasets — Snowflake's core value proposition.</p>
+      </div>
+    </div>
+
+    <div class="chart-wrap" style="margin-top:2rem">
+      <h3>Competitive Feature Comparison</h3>
+      <div class="chart-sub">Cloud Data Platforms — Feature matrix based on public documentation (2024–2025)</div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr><th>Feature</th><th>Snowflake</th><th>Databricks</th><th>MongoDB</th><th>Palantir</th><th>Datadog</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Multi-Cloud Deployment</td><td style="color:var(--green)">✓</td><td style="color:var(--red)">✗</td><td style="color:var(--red)">✗</td><td style="color:var(--red)">✗</td><td style="color:var(--red)">✗</td></tr>
+            <tr><td>Decoupled Storage & Compute</td><td style="color:var(--green)">✓</td><td style="color:var(--amber)">Partial</td><td style="color:var(--red)">✗</td><td style="color:var(--red)">✗</td><td style="color:var(--red)">✗</td></tr>
+            <tr><td>Data Sharing Ecosystem</td><td style="color:var(--green)">✓</td><td style="color:var(--red)">✗</td><td style="color:var(--red)">✗</td><td style="color:var(--red)">✗</td><td style="color:var(--red)">✗</td></tr>
+            <tr><td>AI/ML Native Integration</td><td style="color:var(--green)">✓</td><td style="color:var(--green)">✓</td><td style="color:var(--amber)">Limited</td><td style="color:var(--green)">✓</td><td style="color:var(--green)">✓</td></tr>
+            <tr><td>Marketplace / Third-Party Apps</td><td style="color:var(--green)">✓</td><td style="color:var(--red)">✗</td><td style="color:var(--red)">✗</td><td style="color:var(--red)">✗</td><td style="color:var(--red)">✗</td></tr>
+            <tr><td>Consumption-Based Pricing</td><td style="color:var(--green)">✓</td><td style="color:var(--green)">✓</td><td style="color:var(--red)">✗</td><td style="color:var(--red)">✗</td><td style="color:var(--green)">✓</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ COMPS ═══════════ -->
+<section id="comps">
+  <div class="container reveal">
+    <div class="section-label">Comparable Companies</div>
+    <div class="section-title">Position vs. Trading Comps</div>
+    <div class="section-desc">
+      Snowflake trades at 20.7x EV/Revenue — slightly below the peer median of 23.3x but above on EV/Gross Profit at 27.0x (peer median 17.0x), reflecting the market's willingness to pay for quality of revenue.
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Company</th><th>Ticker</th><th>Price</th><th>Mkt Cap ($M)</th><th>EV ($M)</th><th>EV/Rev</th><th>EV/EBITDA</th><th>P/E</th><th>EV/GP</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>CoreWeave</td><td>CRWV</td><td>$78.13</td><td>38,934</td><td>50,277</td><td>36.8x</td><td>17.0x</td><td>—</td><td>1.0x</td></tr>
+          <tr><td>Datadog</td><td>DDOG</td><td>$156.61</td><td>54,917</td><td>52,387</td><td>20.4x</td><td>65.0x</td><td>498.7x</td><td>20.0x</td></tr>
+          <tr><td>Palantir</td><td>PLTR</td><td>$170.92</td><td>407,205</td><td>362,971</td><td>103.6x</td><td>590.0x</td><td>399.7x</td><td>124.9x</td></tr>
+          <tr><td>CrowdStrike</td><td>CRWD</td><td>$515.53</td><td>129,375</td><td>119,012</td><td>30.7x</td><td>120.0x</td><td>—</td><td>50.0x</td></tr>
+          <tr><td>MongoDB</td><td>MDB</td><td>$404.59</td><td>32,916</td><td>23,854</td><td>11.5x</td><td>80.0x</td><td>—</td><td>17.0x</td></tr>
+          <tr><td>Twilio</td><td>TWLO</td><td>$130.67</td><td>19,812</td><td>17,976</td><td>23.3x</td><td>18.0x</td><td>316.3x</td><td>8.0x</td></tr>
+          <tr><td>Okta</td><td>OKTA</td><td>$82.12</td><td>14,216</td><td>12,298</td><td>16.1x</td><td>20.0x</td><td>99.8x</td><td>7.0x</td></tr>
+          <tr><td>DocuSign</td><td>DOCU</td><td>$69.69</td><td>14,015</td><td>13,024</td><td>12.9x</td><td>14.0x</td><td>52.4x</td><td>6.0x</td></tr>
+          <tr><td>Zscaler</td><td>ZS</td><td>$241.50</td><td>38,512</td><td>37,312</td><td>35.1x</td><td>54.0x</td><td>—</td><td>21.0x</td></tr>
+          <tr><td>HubSpot</td><td>HUBS</td><td>$377.70</td><td>19,786</td><td>18,347</td><td>27.1x</td><td>26.0x</td><td>—</td><td>9.0x</td></tr>
+          <tr class="highlight"><td>Snowflake</td><td>SNOW</td><td>$260.82</td><td>88,364</td><td>77,372</td><td>20.7x</td><td>—</td><td>—</td><td>27.0x</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="chart-row">
+      <div class="chart-wrap">
+        <h3>EV / Revenue Comparison</h3>
+        <div class="chart-sub">Snowflake vs. high-growth software peers</div>
+        <canvas id="evRevChart"></canvas>
+      </div>
+      <div class="chart-wrap">
+        <h3>EV / Gross Profit Comparison</h3>
+        <div class="chart-sub">Premium reflects quality of revenue</div>
+        <canvas id="evGpChart"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ VALUATION ═══════════ -->
+<section id="valuation">
+  <div class="container reveal">
+    <div class="section-label">Valuation</div>
+    <div class="section-title">DCF Analysis</div>
+    <div class="section-desc">
+      Our ten-year DCF yields a base case share price of $245 (EBITDA Multiple Method) and $259 (Perpetuity Method), averaging to a fair value of ~$252. We present three scenarios with probability-weighted target of $210.48.
+    </div>
+
+    <div class="scenario-tabs">
+      <button class="scenario-tab active" onclick="switchScenario('base')">Base Case</button>
+      <button class="scenario-tab" onclick="switchScenario('bull')">Bull Case</button>
+      <button class="scenario-tab" onclick="switchScenario('bear')">Bear Case</button>
+    </div>
+
+    <!-- BASE -->
+    <div id="scenario-base" class="scenario-content active">
+      <div class="dcf-grid">
+        <div class="dcf-card">
+          <h3>EBITDA Multiple Method</h3>
+          <div class="dcf-row"><span class="lbl">WACC</span><span class="val">8.20%</span></div>
+          <div class="dcf-row"><span class="lbl">PV of Free Cash Flows</span><span class="val">$17,469M</span></div>
+          <div class="dcf-row"><span class="lbl">2035E EBITDA</span><span class="val">$7,201M</span></div>
+          <div class="dcf-row"><span class="lbl">Terminal Multiple</span><span class="val">20.0x</span></div>
+          <div class="dcf-row"><span class="lbl">Terminal Value</span><span class="val">$144,021M</span></div>
+          <div class="dcf-row"><span class="lbl">PV of Terminal Value</span><span class="val">$65,487M</span></div>
+          <div class="dcf-row"><span class="lbl">Enterprise Value</span><span class="val">$82,956M</span></div>
+          <div class="dcf-row total"><span class="lbl">Implied Share Price</span><span class="val">$245</span></div>
+        </div>
+        <div class="dcf-card">
+          <h3>Perpetuity Growth Method</h3>
+          <div class="dcf-row"><span class="lbl">WACC</span><span class="val">8.20%</span></div>
+          <div class="dcf-row"><span class="lbl">PV of Free Cash Flows</span><span class="val">$17,469M</span></div>
+          <div class="dcf-row"><span class="lbl">Terminal Growth Rate</span><span class="val">3.0%</span></div>
+          <div class="dcf-row"><span class="lbl">Terminal Value</span><span class="val">$154,679M</span></div>
+          <div class="dcf-row"><span class="lbl">PV of Terminal Value</span><span class="val">$70,333M</span></div>
+          <div class="dcf-row"><span class="lbl">Enterprise Value</span><span class="val">$87,802M</span></div>
+          <div class="dcf-row total"><span class="lbl">Implied Share Price</span><span class="val">$259</span></div>
+        </div>
+      </div>
+
+      <div class="dcf-grid">
+        <div class="dcf-card">
+          <h3>Sensitivity: WACC vs. EBITDA Multiple</h3>
+          <table class="sens-table">
+            <thead><tr><th></th><th>18.0x</th><th>19.0x</th><th>20.0x</th><th>21.0x</th><th>22.0x</th></tr></thead>
+            <tbody>
+              <tr><td>6.7%</td><td>$257</td><td>$269</td><td>$280</td><td>$291</td><td>$302</td></tr>
+              <tr><td>7.7%</td><td>$236</td><td>$246</td><td>$256</td><td>$266</td><td>$276</td></tr>
+              <tr><td><strong>8.2%</strong></td><td>$226</td><td>$235</td><td class="center-cell">$245</td><td>$255</td><td>$264</td></tr>
+              <tr><td>8.7%</td><td>$216</td><td>$225</td><td>$234</td><td>$244</td><td>$253</td></tr>
+              <tr><td>9.7%</td><td>$198</td><td>$206</td><td>$215</td><td>$223</td><td>$232</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="dcf-card">
+          <h3>Sensitivity: WACC vs. Growth Rate</h3>
+          <table class="sens-table">
+            <thead><tr><th></th><th>2.0%</th><th>2.5%</th><th>3.0%</th><th>3.5%</th><th>4.0%</th></tr></thead>
+            <tbody>
+              <tr><td>6.7%</td><td>$319</td><td>$351</td><td>$393</td><td>$447</td><td>$522</td></tr>
+              <tr><td>7.7%</td><td>$250</td><td>$270</td><td>$294</td><td>$324</td><td>$362</td></tr>
+              <tr><td><strong>8.2%</strong></td><td>$224</td><td>$240</td><td class="center-cell">$259</td><td>$282</td><td>$311</td></tr>
+              <tr><td>8.7%</td><td>$202</td><td>$215</td><td>$231</td><td>$249</td><td>$271</td></tr>
+              <tr><td>9.7%</td><td>$167</td><td>$176</td><td>$187</td><td>$199</td><td>$213</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- BULL -->
+    <div id="scenario-bull" class="scenario-content">
+      <div class="dcf-grid">
+        <div class="dcf-card">
+          <h3>Bull — EBITDA Multiple Method</h3>
+          <div class="dcf-row"><span class="lbl">PV of CFs</span><span class="val">$19,587M</span></div>
+          <div class="dcf-row"><span class="lbl">2035E EBITDA</span><span class="val">$8,057M</span></div>
+          <div class="dcf-row"><span class="lbl">Terminal Value</span><span class="val">$161,147M</span></div>
+          <div class="dcf-row"><span class="lbl">Enterprise Value</span><span class="val">$92,861M</span></div>
+          <div class="dcf-row total"><span class="lbl">Implied Share Price</span><span class="val">$274</span></div>
+        </div>
+        <div class="dcf-card">
+          <h3>Bull — Perpetuity Growth Method</h3>
+          <div class="dcf-row"><span class="lbl">PV of CFs</span><span class="val">$19,587M</span></div>
+          <div class="dcf-row"><span class="lbl">Terminal Value</span><span class="val">$173,603M</span></div>
+          <div class="dcf-row"><span class="lbl">Enterprise Value</span><span class="val">$98,525M</span></div>
+          <div class="dcf-row total"><span class="lbl">Implied Share Price</span><span class="val">$291</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BEAR -->
+    <div id="scenario-bear" class="scenario-content">
+      <div class="dcf-grid">
+        <div class="dcf-card">
+          <h3>Bear — EBITDA Multiple Method</h3>
+          <div class="dcf-row"><span class="lbl">PV of CFs</span><span class="val">$15,503M</span></div>
+          <div class="dcf-row"><span class="lbl">2035E EBITDA</span><span class="val">$6,426M</span></div>
+          <div class="dcf-row"><span class="lbl">Terminal Value</span><span class="val">$128,515M</span></div>
+          <div class="dcf-row"><span class="lbl">Enterprise Value</span><span class="val">$73,939M</span></div>
+          <div class="dcf-row total"><span class="lbl">Implied Share Price</span><span class="val">$218</span></div>
+        </div>
+        <div class="dcf-card">
+          <h3>Bear — Perpetuity Growth Method</h3>
+          <div class="dcf-row"><span class="lbl">PV of CFs</span><span class="val">$15,503M</span></div>
+          <div class="dcf-row"><span class="lbl">Terminal Value</span><span class="val">$137,543M</span></div>
+          <div class="dcf-row"><span class="lbl">Enterprise Value</span><span class="val">$78,044M</span></div>
+          <div class="dcf-row total"><span class="lbl">Implied Share Price</span><span class="val">$230</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WACC Breakdown -->
+    <div class="dcf-card" style="margin-top:2rem; max-width:500px;">
+      <h3>WACC Calculation</h3>
+      <div class="dcf-row"><span class="lbl">Unlevered Beta</span><span class="val">0.85</span></div>
+      <div class="dcf-row"><span class="lbl">Levered Beta</span><span class="val">0.87</span></div>
+      <div class="dcf-row"><span class="lbl">Risk-Free Rate</span><span class="val">4.1%</span></div>
+      <div class="dcf-row"><span class="lbl">Equity Risk Premium</span><span class="val">5.0%</span></div>
+      <div class="dcf-row"><span class="lbl">Cost of Equity</span><span class="val">8.4%</span></div>
+      <div class="dcf-row"><span class="lbl">Cost of Debt</span><span class="val">5.6%</span></div>
+      <div class="dcf-row"><span class="lbl">% Equity</span><span class="val">97.4%</span></div>
+      <div class="dcf-row total"><span class="lbl">WACC</span><span class="val">8.20%</span></div>
+    </div>
+
+    <!-- Projected Revenue Chart -->
+    <div class="chart-wrap" style="margin-top:2rem">
+      <h3>Projected Revenue — Base Case</h3>
+      <div class="chart-sub">FY2023A – FY2035E ($ in millions)</div>
+      <canvas id="projRevenueChart"></canvas>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ RISKS ═══════════ -->
+<section id="risks">
+  <div class="container reveal">
+    <div class="section-label">Risk Factors</div>
+    <div class="section-title">What Could Go Wrong</div>
+    <div class="section-desc">
+      While Snowflake's positioning is strong, several factors could pressure the stock and justify caution at current valuation levels.
+    </div>
+
+    <div class="risk-grid">
+      <div class="risk-item">
+        <h4>Hyperscaler Competition</h4>
+        <p>AWS, Azure, and GCP continue to build native analytics and AI services. If hyperscalers undercut Snowflake on price or match its features, adoption could slow.</p>
+      </div>
+      <div class="risk-item">
+        <h4>Consumption Deceleration</h4>
+        <p>In a macro slowdown, enterprises may optimize cloud spend. Since Snowflake's revenue is usage-based, a pullback in data processing volumes directly impacts revenue.</p>
+      </div>
+      <div class="risk-item">
+        <h4>NRR Compression</h4>
+        <p>If net revenue retention falls below 120%, it would signal weakening customer expansion and likely trigger a significant multiple de-rating.</p>
+      </div>
+      <div class="risk-item">
+        <h4>Stock-Based Compensation</h4>
+        <p>Snowflake's SBC remains elevated relative to revenue, diluting shareholders. Until GAAP profitability improves, the valuation premium could come under pressure.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer>
+  <div class="container">
+    <p style="margin-bottom:1rem; color:var(--text2);">
+      <strong style="color:var(--accent)">Snowflake Inc. (NYSE: SNOW)</strong> — Equity Research Report
+    </p>
+    <p>
+      This report is for informational purposes only and does not constitute investment advice.
+      Data as of November 30, 2025. Past performance is not indicative of future results.
+      All projections represent estimates and are subject to change.
+    </p>
+  </div>
+</footer>
+
+<script>
+// ── Chart.js defaults ──
+Chart.defaults.color = '#8899aa';
+Chart.defaults.borderColor = 'rgba(30,45,61,0.5)';
+Chart.defaults.font.family = "'Instrument Sans', sans-serif";
+Chart.defaults.font.size = 12;
+
+const accent = '#29b6f6';
+const accent2 = '#00e5ff';
+const green = '#4caf50';
+const red = '#ef5350';
+const amber = '#ffb74d';
+
+// ── Revenue Chart ──
+new Chart(document.getElementById('revenueChart'), {
+  type: 'bar',
+  data: {
+    labels: ['FY2021', 'FY2022', 'FY2023', 'FY2024', 'FY2025'],
+    datasets: [{
+      label: 'Revenue ($M)',
+      data: [592, 1219, 2066, 2807, 3626],
+      backgroundColor: [
+        'rgba(41,182,246,0.3)', 'rgba(41,182,246,0.4)', 'rgba(41,182,246,0.5)',
+        'rgba(41,182,246,0.65)', 'rgba(41,182,246,0.85)'
+      ],
+      borderColor: accent,
+      borderWidth: 1,
+      borderRadius: 6,
+    }, {
+      label: 'YoY Growth %',
+      data: [null, 106, 69, 36, 29],
+      type: 'line',
+      borderColor: amber,
+      backgroundColor: 'transparent',
+      pointBackgroundColor: amber,
+      pointRadius: 5,
+      yAxisID: 'y1',
+      tension: 0.3,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } } },
+    scales: {
+      y: { beginAtZero: true, grid: { color: 'rgba(30,45,61,0.3)' } },
+      y1: { position: 'right', beginAtZero: true, grid: { display: false }, ticks: { callback: v => v + '%' } }
+    }
+  }
+});
+
+// ── Margin Chart ──
+new Chart(document.getElementById('marginChart'), {
+  type: 'line',
+  data: {
+    labels: ['FY2021', 'FY2022', 'FY2023', 'FY2024', 'FY2025'],
+    datasets: [
+      { label: 'Gross Margin', data: [65, 68, 67, 68, 67], borderColor: green, backgroundColor: 'rgba(76,175,80,0.1)', fill: true, tension: 0.3, pointRadius: 4 },
+      { label: 'FCF Margin', data: [null, 34, 37, 39, 36], borderColor: accent, backgroundColor: 'rgba(41,182,246,0.1)', fill: true, tension: 0.3, pointRadius: 4 },
+      { label: 'Net Income Margin', data: [-91, -56, -39, -30, -36], borderColor: red, backgroundColor: 'rgba(239,83,80,0.1)', fill: true, tension: 0.3, pointRadius: 4 },
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } } },
+    scales: {
+      y: { grid: { color: 'rgba(30,45,61,0.3)' }, ticks: { callback: v => v + '%' } }
+    }
+  }
+});
+
+// ── Segment Chart ──
+new Chart(document.getElementById('segmentChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Product Revenue', 'Professional Services'],
+    datasets: [{
+      data: [95.5, 4.5],
+      backgroundColor: [accent, 'rgba(41,182,246,0.2)'],
+      borderColor: '#111827',
+      borderWidth: 3,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
+    },
+    cutout: '65%',
+  }
+});
+
+// ── EV/Revenue Comps ──
+const compNames = ['CRWV','DDOG','PLTR','CRWD','MDB','TWLO','OKTA','DOCU','ZS','HUBS','SNOW'];
+const evRevData = [36.8, 20.4, 103.6, 30.7, 11.5, 23.3, 16.1, 12.9, 35.1, 27.1, 20.7];
+
+new Chart(document.getElementById('evRevChart'), {
+  type: 'bar',
+  data: {
+    labels: compNames,
+    datasets: [{
+      data: evRevData,
+      backgroundColor: compNames.map(n => n === 'SNOW' ? accent : 'rgba(41,182,246,0.2)'),
+      borderColor: compNames.map(n => n === 'SNOW' ? accent : 'rgba(41,182,246,0.4)'),
+      borderWidth: 1,
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { beginAtZero: true, grid: { color: 'rgba(30,45,61,0.3)' }, ticks: { callback: v => v + 'x' } }
+    }
+  }
+});
+
+// ── EV/Gross Profit Comps ──
+const evGpData = [1, 20, 124.9, 50, 17, 8, 7, 6, 21, 9, 27];
+
+new Chart(document.getElementById('evGpChart'), {
+  type: 'bar',
+  data: {
+    labels: compNames,
+    datasets: [{
+      data: evGpData,
+      backgroundColor: compNames.map(n => n === 'SNOW' ? accent2 : 'rgba(0,229,255,0.15)'),
+      borderColor: compNames.map(n => n === 'SNOW' ? accent2 : 'rgba(0,229,255,0.3)'),
+      borderWidth: 1,
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { beginAtZero: true, grid: { color: 'rgba(30,45,61,0.3)' }, ticks: { callback: v => v + 'x' } }
+    }
+  }
+});
+
+// ── Projected Revenue ──
+new Chart(document.getElementById('projRevenueChart'), {
+  type: 'bar',
+  data: {
+    labels: ['FY23A','FY24A','FY25A','FY26E','FY27E','FY28E','FY29E','FY30E','FY31E','FY32E','FY33E','FY34E','FY35E'],
+    datasets: [{
+      label: 'Revenue ($M)',
+      data: [2066, 2807, 3626, 4606, 5757, 7139, 8780, 10537, 12433, 14298, 16300, 18582, 20997],
+      backgroundColor: (ctx) => {
+        const i = ctx.dataIndex;
+        return i < 3 ? 'rgba(41,182,246,0.7)' : 'rgba(41,182,246,0.3)';
+      },
+      borderColor: accent,
+      borderWidth: 1,
+      borderRadius: 4,
+    }, {
+      label: 'YoY Growth %',
+      data: [null, 36, 29, 27, 25, 24, 23, 20, 18, 15, 14, 14, 13],
+      type: 'line',
+      borderColor: amber,
+      backgroundColor: 'transparent',
+      pointBackgroundColor: amber,
+      pointRadius: 4,
+      yAxisID: 'y1',
+      tension: 0.3,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } } },
+    scales: {
+      y: { beginAtZero: true, grid: { color: 'rgba(30,45,61,0.3)' }, ticks: { callback: v => '$' + (v/1000).toFixed(0) + 'B' } },
+      y1: { position: 'right', beginAtZero: true, grid: { display: false }, ticks: { callback: v => v + '%' } }
+    }
+  }
+});
+
+// ── Scenario tabs ──
+function switchScenario(s) {
+  document.querySelectorAll('.scenario-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.scenario-content').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('scenario-' + s).classList.add('active');
+}
+
+// ── Scroll reveal ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
